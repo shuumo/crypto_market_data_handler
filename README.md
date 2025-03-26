@@ -1,4 +1,5 @@
 This program is a Crypto Market Data Aggregator, aiming to utilize efficient concurrent programming, websockets and rest api. It will be implemented in C++23, and cmake/makefile for building.
+This program uses mutex wrapper class for the hashmap data buffer, I will also create a wait-free lock-free varient of the same program. Possibly with uwebsockets aswell to decrease latency even lower. 
 
 ## MVP REQUIREMENTS IN FUNCTIONALITY
 1. Fetch real-time data from three cryptocurrency exchanges. (with precise timestamps)
