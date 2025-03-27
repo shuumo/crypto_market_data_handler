@@ -23,7 +23,7 @@ int main() {
     // load data to program
     if(!Loader::get_symbols(symbols)) failure();
     if(!Loader::get_exchanges(exchanges)) failure(); 
-    //map.init_keys(symbols);
+    if(!map.init_keys(symbols)) failure();
 
     // begin program
     Taskrunner::start(map, symbols, exchanges);
