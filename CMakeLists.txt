@@ -8,8 +8,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(${TARGET_NAME}
     Main.cpp
+    Core/TaskRunner.hpp
+    Core/TaskRunner.cpp
     Loader/Loader.hpp
     Loader/Loader.cpp
+    DataStore/DataPair.hpp
+    DataStore/DataPair.cpp
+    DataStore/DataPoint.hpp
+    DataStore/DataStore.hpp
+    DataStore/DataStore.cpp
+    ExchangeSocket/IExchangeSocket.hpp
 )
 
 message(STATUS "Welcome to Arnavs project: " ${TARGET_NAME})

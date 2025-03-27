@@ -42,7 +42,7 @@ public:
  
     /*
     * Returns list of data_pairs in order (ask - bid) in a vector
-    * e.g. start BTCUSDT LTCUSDT end
+    * e.g. start BTCUSDT BTCLTC end
     */
     std::vector<DataPair> get_full_list() const; 
 
