@@ -15,18 +15,16 @@ void failure() {
 }
 
 int main() {
-    // pre-loader data setup
+    // data structures 
     DataStore map;
     std::vector<std::string> symbols; 
     std::vector<std::unique_ptr<IExchangeSocket>> exchanges;
 
-    // load data to program
+    // load data for task runner 
     if(!Loader::get_symbols(symbols)) failure();
     if(!Loader::get_exchanges(exchanges)) failure(); 
     if(!map.init_keys(symbols)) failure();
 
     // begin program
-    Taskrunner::start(map, symbols, exchanges);
-
-    return 0;
+    return Taskrunner::start(map, symbols, exchanges);
 }
