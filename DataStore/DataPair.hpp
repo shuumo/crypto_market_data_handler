@@ -12,11 +12,6 @@ private:
     std::mutex data_mutex;
 
     /*
-     * Chrono time of when this data pair was modified last
-     */
-    int chrono_latest;
-
-    /*
      * DataPoint containing bid data
      */
     DataPoint bid;
@@ -27,13 +22,13 @@ private:
     DataPoint ask;
 public:
     /*
-    * Returns true if a valid ask DataPoint exists.
+    * Returns true if a valid ask exists.
     * False Otherwise.
     */
     bool valid_ask() const;
 
     /*
-    * Returns true if a valid bid DataPoint exists.
+    * Returns true if a valid bid exists.
     * False Otherwise.
     */
     bool valid_bid() const;
@@ -47,6 +42,11 @@ public:
     * Returns copy of ask DataPoint
     */
     DataPoint getAsk() const;
+
+    /*
+    * Returns a reference to the mutex of the class
+    */
+    std::mutex& getMutex();
 
     /*
     * Sets bid DataPoint with parameter bid

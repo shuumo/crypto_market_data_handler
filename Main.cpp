@@ -9,21 +9,21 @@
 #include "ExchangeSocket/IExchangeSocket.hpp"
 
 
-void failure() {
-    std::cout << "failure" << '\n';
+void err(std::string description) {
+    std::cout << "err in: " << description << '\n';
     exit(0);
 }
 
 int main() {
     // data structures 
     DataStore map;
-    std::vector<std::string> symbols; 
+    std::vector<std::string> symbols;
     std::vector<std::unique_ptr<IExchangeSocket>> exchanges;
 
     // load data for task runner 
-    if(!Loader::get_symbols(symbols)) failure();
-    if(!Loader::get_exchanges(exchanges)) failure(); 
-    if(!map.init_keys(symbols)) failure();
+    if(!Loader::get_symbols(symbols)) err("symbols");
+    if(!Loader::get_exchanges(exchanges)) err("exchanges"); 
+    if(!map.init_symbol_keys(symbols, exchanges.size())) err("key list init");
 
     // begin program
     return Taskrunner::start(map, symbols, exchanges);

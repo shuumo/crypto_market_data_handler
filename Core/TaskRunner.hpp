@@ -12,9 +12,9 @@ private:
 
 public:
     /*
-    *  Begins main loop of program
+    *  Manages threads
     */
-    static int start(DataStore &map, std::vector<std::string> &symbols, std::vector<std::unique_ptr<IExchangeSocket>> &exchanges);
+    static int start(DataStore &map, const std::vector<std::string> &symbols, std::vector<std::unique_ptr<IExchangeSocket>> &exchanges);
  
 };
 

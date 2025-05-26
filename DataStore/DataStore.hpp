@@ -3,48 +3,59 @@
 
 #include <unordered_map>
 #include <string>
-#include "../DataStore/DataPair.hpp"
 #include <vector>
+
+#include "../DataStore/DataPair.hpp"
 
 class DataStore {
 private:
-    std::unordered_map<std::string, DataPair> map;
+    /*
+     * symbol -> exchange via index id -> DataPair(bid-ask)
+     */
+    std::unordered_map<std::string, std::vector<DataPair>> map;
 
 public:
     /*
      * Takes a string vector of keys and creates
-     * each key pair.
+     * each key pair for symbols and its list of exchanges.
      * Returns 1 on success, 0 on fail.
      */
-    bool init_keys(std::vector<std::string> &key_list); 
+    bool init_symbol_keys(std::vector<std::string> &key_list, const int count); 
 
     /*
-    * Replace ask DataPoint for spesific key's DataPair
-    * Returns 1 on success, 0 on fail.
+    * Replace ask DataPoint for spesific exchange (id) and symbol (key)'s DataPair
+    * Returns true on success, false on fail.
     */
-    bool write_ask(std::string key, DataPoint);
+    bool write_ask(int id, std::string key, DataPoint ask);
 
     /*
-    * Replace bid DataPoint for spesific key's DataPair
-    * Returns 1 on success, 0 on fail.
+    * Replace bid DataPoint for spesific exchange (id) and symbol (key)'s DataPair
+    * Returns true on success, false on fail.
     */
-    bool write_bid(std::string key, DataPoint);
+    bool write_bid(int id, std::string key, DataPoint bid);
 
     /*
-    * read ask DataPoint for spesific key's DataPair
-    */
-    DataPoint read_bid(std::string key) const;
+     * Returns a copy of a ask DataPoint for spesific exchange (id) and symbol (key)'s DataPair
+     */
+    DataPoint get_ask(int id, std::string key);
 
     /*
-    * read bid DataPoint for spesific key's DataPair
-    */
-    DataPoint read_ask(std::string key) const;
- 
+     * Returns a copy of a bid DataPoint for spesific exchange (id) and symbol (key)'s DataPair
+     */
+    DataPoint get_bid(int id, std::string key);
+
     /*
-    * Returns list of data_pairs in order (ask - bid) in a vector
-    * e.g. start BTCUSDT BTCLTC end
+    * Iterator overloads
     */
-    std::vector<DataPair> get_full_list() const; 
+    auto begin()       -> decltype(map.begin())  { return map.begin(); }
+    auto end()         -> decltype(map.end())    { return map.end(); }
+
+    auto begin() const -> decltype(map.begin())  { return map.begin(); }
+    auto end()   const -> decltype(map.end())    { return map.end(); }
+
+    auto cbegin() const -> decltype(map.cbegin()) { return map.cbegin(); }
+    auto cend()   const -> decltype(map.cend())   { return map.cend(); }
+
 
 };
 

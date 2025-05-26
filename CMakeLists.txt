@@ -15,9 +15,16 @@ add_executable(${TARGET_NAME}
     DataStore/DataPair.hpp
     DataStore/DataPair.cpp
     DataStore/DataPoint.hpp
+    DataStore/NoAtomicDataPair.hpp
     DataStore/DataStore.hpp
     DataStore/DataStore.cpp
     ExchangeSocket/IExchangeSocket.hpp
+    ExchangeSocket/TestSocket.cpp
+    Front/IFront.hpp
+    Front/CliFront.cpp
+    Front/ReaderManager.hpp
+    Front/ReaderManager.cpp
+    
 )
 
 message(STATUS "Welcome to Arnavs project: " ${TARGET_NAME})
