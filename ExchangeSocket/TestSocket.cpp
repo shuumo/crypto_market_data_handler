@@ -27,11 +27,10 @@ public:
                 bid.price = bid_price;
                 // access map
                 map.write_bid(id, symbol, bid);
-                std::cout << "value " << bid_price << " checked bid for symbol: " << symbol << " by thread " << id << std::endl;
+                //std::cout << "value " << bid_price << " checked bid for symbol: " << symbol << " by thread " << id << std::endl;
                 map.write_ask(id, symbol, ask);
-                std::cout << "value " << ask_price << " checked ask for symbol: " << symbol << " by thread " << id << std::endl;
+                //std::cout << "value " << ask_price << " checked ask for symbol: " << symbol << " by thread " << id << std::endl;
             }
-            if(++i == 10) break;
         }
     }
 };

@@ -6,13 +6,13 @@
 void ReaderManager::reader_main(DataStore &map, const std::vector<std::string> &symbols) {
     //create output pointers
     std::shared_ptr<IFront> cli_output(std::make_shared<CliFront>());
-    
+ 
     // main reader loop
     int i{};
     while(true) {
         auto best_bid_asks = best_bid_ask_algorithm(map);
         output_best(best_bid_asks, cli_output);
-        if(++i == 15) break;
+        if(++i == 10000) exit(1);
     }
 }
 
