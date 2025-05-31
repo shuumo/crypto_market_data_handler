@@ -12,7 +12,7 @@ void ReaderManager::reader_main(DataStore &map, const std::vector<std::string> &
     while(true) {
         auto best_bid_asks = best_bid_ask_algorithm(map);
         output_best(best_bid_asks, cli_output);
-        if(++i == 10000) exit(1);
+        //if(++i == 10000) exit(1);
     }
 }
 
