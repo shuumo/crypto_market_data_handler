@@ -3,7 +3,6 @@
 #include <nlohmann/json.hpp>
 #include "IExchangeSocket.hpp"
 
-using json = nlohmann::json;
 typedef websocketpp::client<websocketpp::config::asio_tls_client> client;
 
 class BinanceSocket : public IExchangeSocket {
@@ -11,12 +10,12 @@ public:
     void run_socket(DataStore &map, const std::vector<std::string> &symbols,
                     std::vector<std::unique_ptr<IExchangeSocket>> &exchanges, const int id) override {
 
-        if (symbols.empty()) return;
+        if(symbols.empty()) return;
 
         std::string uri = "wss://stream.binance.com:9443/stream?streams=";
-        for (size_t i = 0; i < symbols.size(); ++i) {
+        for(size_t i = 0; i < symbols.size(); ++i) {
             uri += symbols[i] + "@bookTicker";
-            if (i < symbols.size() - 1) uri += "/";
+            if(i < symbols.size() - 1) uri += "/";
         }
 
         client c;
@@ -32,7 +31,7 @@ public:
 
         c.set_message_handler([&map, id](websocketpp::connection_hdl, client::message_ptr msg) {
             try {
-                auto j = json::parse(msg->get_payload());
+                auto j = nlohmann::json::parse(msg->get_payload());
                 //std::cout << msg->get_payload() << std::endl;
                 const auto& data = j["data"];
                 std::string symbol = data["s"];
@@ -41,9 +40,13 @@ public:
                 double ask = std::stod(data["a"].get<std::string>());
 
                 DataPoint bid_point;
-                bid_point.price = bid;
                 DataPoint ask_point;
+
+                bid_point.price = bid;
                 ask_point.price = ask;
+                bid_point.exchange_name = "Binance";
+                ask_point.exchange_name = "Binance";
+
                 //std::cout << "This threads id is: " << id << '\n';
                 map.write_bid(id, symbol, bid_point);
                 map.write_ask(id, symbol, ask_point);
