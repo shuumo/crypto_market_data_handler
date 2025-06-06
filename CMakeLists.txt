@@ -27,7 +27,7 @@ add_executable(${TARGET_NAME}
     DataStore/DataStore.cpp
     ExchangeSocket/IExchangeSocket.hpp
     ExchangeSocket/BinanceSocket.cpp
-    ExchangeSocket/KucoinSocket.cpp
+    ExchangeSocket/CoinbaseSocket.cpp
     ExchangeSocket/TestSocket.cpp
     Front/IFront.hpp
     Front/CliFront.cpp
