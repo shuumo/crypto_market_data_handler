@@ -16,6 +16,7 @@ add_executable(${TARGET_NAME}
     Main.cpp
     Core/TaskRunner.hpp
     Core/TaskRunner.cpp
+    Core/AtomicGuard.hpp
     Loader/Loader.hpp
     Loader/Loader.cpp
     DataStore/DataPair.hpp
@@ -26,6 +27,7 @@ add_executable(${TARGET_NAME}
     DataStore/DataStore.cpp
     ExchangeSocket/IExchangeSocket.hpp
     ExchangeSocket/BinanceSocket.cpp
+    ExchangeSocket/KucoinSocket.cpp
     ExchangeSocket/TestSocket.cpp
     Front/IFront.hpp
     Front/CliFront.cpp

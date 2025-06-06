@@ -2,14 +2,21 @@
 #define DATA_PAIR
 
 #include "../DataStore/DataPoint.hpp"
-#include <mutex>
+//#include <mutex>
+#include <atomic>
 
 class DataPair {
 private:
     /*
      * Mutex for the DataPair
      */
-    std::mutex data_mutex;
+    //std::mutex data_mutex;
+
+    /*
+     * Atomic Flag
+     */
+    std::atomic<bool> lock = {0};
+
 
     /*
      * DataPoint containing bid data
@@ -46,7 +53,25 @@ public:
     /*
     * Returns a reference to the mutex of the class
     */
-    std::mutex& getMutex();
+    //std::mutex& getMutex();
+
+    /*
+     * Assumes lock is free on first try and tries to lock, 
+     * If its not free, wait for lock to be released
+     *
+     * Needs modification for arm, currently uses an x86 instruction.
+     */
+    void lock_atomic_flag() noexcept;
+
+    /*
+     * Checks if lock is free
+     */
+    bool try_atomic_flag() noexcept;
+
+    /*
+     * Unlocks the atomic if held
+     */
+    void unlock_atomic_flag() noexcept;
 
     /*
     * Sets bid DataPoint with parameter bid

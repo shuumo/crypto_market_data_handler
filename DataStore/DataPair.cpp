@@ -1,7 +1,25 @@
 #include "DataPair.hpp" 
 
-std::mutex& DataPair::getMutex() {
-    return data_mutex;
+//std::mutex& DataPair::getMutex() {
+//    return data_mutex;
+//}
+
+void DataPair::lock_atomic_flag() noexcept {
+    while(true) {
+        if (!lock.exchange(true, std::memory_order_acquire)) return;
+        while(lock.load(std::memory_order_relaxed)) {
+            __builtin_ia32_pause();
+        }
+    }
+}
+
+bool DataPair::try_atomic_flag() noexcept {
+    return !lock.load(std::memory_order_relaxed) &&
+           !lock.exchange(true, std::memory_order_acquire);
+}
+
+void DataPair::unlock_atomic_flag() noexcept {
+    lock.store(false, std::memory_order_release);
 }
 
 DataPoint DataPair::getAsk() const {
