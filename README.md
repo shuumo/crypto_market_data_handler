@@ -1,6 +1,6 @@
 # Crypto Market Data Aggregator
 
-A high-performance, modular C++ application designed for real-time market data ingestion and arbitrage detection. Its architecture is decoupled into specialized components: Exchange Sockets, Thread Safe DataStore and Reader Management, which together enable seamless integration of new exchanges and front end outputs while maintaining low latency.
+A high-performance, modular C++ application designed for real-time market data ingestion and support for optional add on funtionality based on collected data via modularity, such as arbitrage detection. Its architecture is decoupled into specialized components: Exchange Sockets, Thread Safe DataStore and Reader Management, which together enable seamless integration of new exchanges and front end outputs while maintaining low latency.
 
 ## Dependencies
 
