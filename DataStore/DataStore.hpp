@@ -4,59 +4,40 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include <shared_mutex>
 
 #include "../DataStore/DataPair.hpp"
 
 class DataStore {
 private:
-    /*
-     * symbol -> exchange via index id -> DataPair(bid-ask)
-     */
     std::unordered_map<std::string, std::vector<DataPair>> map;
+    mutable std::shared_mutex map_mutex;
 
 public:
-    /*
-     * Takes a string vector of keys and creates
-     * each key pair for symbols and its list of exchanges.
-     * Returns 1 on success, 0 on fail.
-     */
-    bool init_symbol_keys(std::vector<std::string> &key_list, const int count); 
+    auto init_symbol_keys(const std::vector<std::string> &key_list,
+                          const int count) -> bool; 
 
-    /*
-    * Replace ask DataPoint for spesific exchange (id) and symbol (key)'s DataPair
-    * Returns true on success, false on fail.
-    */
-    bool write_ask(int id, std::string key, DataPoint ask);
+    auto write_ask(int id,
+                   const std::string& key,
+                   const DataPoint& ask) -> bool;
 
-    /*
-    * Replace bid DataPoint for spesific exchange (id) and symbol (key)'s DataPair
-    * Returns true on success, false on fail.
-    */
-    bool write_bid(int id, std::string key, DataPoint bid);
+    auto write_bid(int id,
+                   const std::string& key,
+                   const DataPoint& bid) -> bool;
 
-    /*
-     * Returns a copy of a ask DataPoint for spesific exchange (id) and symbol (key)'s DataPair
-     */
-    DataPoint get_ask(int id, std::string key);
+    auto get_ask(int id,
+                 const std::string& key) -> DataPoint;
 
-    /*
-     * Returns a copy of a bid DataPoint for spesific exchange (id) and symbol (key)'s DataPair
-     */
-    DataPoint get_bid(int id, std::string key);
+    auto get_bid(int id,
+                 const std::string& key) -> DataPoint;
 
-    /*
-    * Iterator overloads
-    */
     auto begin()       -> decltype(map.begin())  { return map.begin(); }
     auto end()         -> decltype(map.end())    { return map.end(); }
 
     auto begin() const -> decltype(map.begin())  { return map.begin(); }
     auto end()   const -> decltype(map.end())    { return map.end(); }
 
-    auto cbegin() const -> decltype(map.cbegin()) { return map.cbegin(); }
-    auto cend()   const -> decltype(map.cend())   { return map.cend(); }
-
-
+    auto get_mutex() const -> std::shared_mutex& { return map_mutex; }
 };
 
 #endif

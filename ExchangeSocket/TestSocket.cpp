@@ -1,36 +1,44 @@
 #include "IExchangeSocket.hpp"
 #include <iostream>
 #include <random>
+#include <thread>
+#include <chrono>
 
 class TestSocket : public IExchangeSocket {
 public:
 
-    int intRand(const int & min, const int & max) {
-        static thread_local std::mt19937 generator;
+    auto intRand(const int & min, const int & max) -> int {
+        static thread_local std::mt19937 generator(std::random_device{}());
         std::uniform_int_distribution<int> distribution(min,max);
         return distribution(generator);
     }
 
-    void run_socket(DataStore &map, const std::vector<std::string> &symbols, std::vector<std::unique_ptr<IExchangeSocket>> &exchanges, const int id) override {
-        double bid{};
-        double ask{};
-        int i = 0;
+    auto run_socket(DataStore &map,
+                    const std::vector<std::string> &symbols, 
+                    std::vector<std::unique_ptr<IExchangeSocket>> &exchanges,
+                    const int id) -> void override {
         while(true) {
             for(const auto& symbol: symbols) {
-                // get exchange data (latest best ask and bid)
-                double bid_price = intRand(0, 100);
-                double ask_price = intRand(0, 100);
-                // create datapoints
-                DataPoint ask;
-                ask.price = ask_price;
-                DataPoint bid;
+                auto bid_price = static_cast<double>(intRand(50, 100));
+                auto ask_price = bid_price + static_cast<double>(intRand(1, 5)) * 0.1;
+
+                auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::system_clock::now().time_since_epoch()).count();
+
+                auto bid = DataPoint{};
                 bid.price = bid_price;
-                // access map
+                bid.exchange_name = "TestEx";
+                bid.timestamp = now;
+
+                auto ask = DataPoint{};
+                ask.price = ask_price;
+                ask.exchange_name = "TestEx";
+                ask.timestamp = now;
+
                 map.write_bid(id, symbol, bid);
-                //std::cout << "value " << bid_price << " checked bid for symbol: " << symbol << " by thread " << id << std::endl;
                 map.write_ask(id, symbol, ask);
-                //std::cout << "value " << ask_price << " checked ask for symbol: " << symbol << " by thread " << id << std::endl;
             }
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
 };

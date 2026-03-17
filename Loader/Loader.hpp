@@ -5,9 +5,7 @@
 #include "../ExchangeSocket/IExchangeSocket.hpp"
 
 class Loader {
-private:
-    
 public:
-    static bool get_symbols(std::vector<std::string> &symbols);
-    static bool get_exchanges(std::vector<std::unique_ptr<IExchangeSocket>> &exchanges);
+    static auto get_symbols(std::vector<std::string> &symbols) -> bool;
+    static auto get_exchanges(std::vector<std::unique_ptr<IExchangeSocket>> &exchanges) -> bool;
 };

@@ -2,86 +2,36 @@
 #define DATA_PAIR
 
 #include "../DataStore/DataPoint.hpp"
-//#include <mutex>
 #include <atomic>
+
+#if defined(__i386__) || defined(__x86_64__)
+    #include <immintrin.h>
+    #define CPU_PAUSE() _mm_pause()
+#elif defined(__arm__) || defined(__aarch64__)
+    #define CPU_PAUSE() __asm__ __volatile__("yield" ::: "memory")
+#else
+    #define CPU_PAUSE() std::this_thread::yield()
+#endif
 
 class DataPair {
 private:
-    /*
-     * Mutex for the DataPair
-     */
-    //std::mutex data_mutex;
-
-    /*
-     * Atomic Flag
-     */
-    std::atomic<bool> lock = {0};
-
-
-    /*
-     * DataPoint containing bid data
-     */
+    std::atomic<bool> lock = {false};
     DataPoint bid;
-
-    /*
-     * DataPoint containing ask data
-     */
     DataPoint ask;
+
 public:
-    /*
-    * Returns true if a valid ask exists.
-    * False Otherwise.
-    */
-    bool valid_ask() const;
+    auto valid_ask() const -> bool;
+    auto valid_bid() const -> bool;
 
-    /*
-    * Returns true if a valid bid exists.
-    * False Otherwise.
-    */
-    bool valid_bid() const;
+    auto getBid() const -> DataPoint;
+    auto getAsk() const -> DataPoint;
 
-    /*
-    * Returns copy of bid DataPoint
-    */
-    DataPoint getBid() const;
+    auto lock_atomic_flag() noexcept -> void;
+    auto try_atomic_flag() noexcept -> bool;
+    auto unlock_atomic_flag() noexcept -> void;
 
-    /*
-    * Returns copy of ask DataPoint
-    */
-    DataPoint getAsk() const;
-
-    /*
-    * Returns a reference to the mutex of the class
-    */
-    //std::mutex& getMutex();
-
-    /*
-     * Assumes lock is free on first try and tries to lock, 
-     * If its not free, wait for lock to be released
-     *
-     * Needs modification for arm, currently uses an x86 instruction.
-     */
-    void lock_atomic_flag() noexcept;
-
-    /*
-     * Checks if lock is free
-     */
-    bool try_atomic_flag() noexcept;
-
-    /*
-     * Unlocks the atomic if held
-     */
-    void unlock_atomic_flag() noexcept;
-
-    /*
-    * Sets bid DataPoint with parameter bid
-    */
-    bool setBid(DataPoint bid);
-
-    /*
-    * Sets ask DataPoint with parameter ask
-    */
-    bool setAsk(DataPoint ask);
+    auto setBid(const DataPoint& bid) -> bool;
+    auto setAsk(const DataPoint& ask) -> bool;
 };
 
 #endif

@@ -7,7 +7,7 @@ struct AtomicGuard {
     DataPair& lock;
 
     explicit AtomicGuard(DataPair& atomic_to_hold) noexcept : lock(atomic_to_hold) {
-        lock.lock_atomic_flag();  
+        lock.lock_atomic_flag();
     }
 
     ~AtomicGuard() {

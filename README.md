@@ -1,4 +1,30 @@
-This program is a Crypto Market Data Aggregator, aiming to utilize correct and efficient-enough concurrent programming and websockets. It will be implemented in C++23, and cmake/makefile for building.
+# Crypto Market Data Aggregator
 
-I need to fill out this readme.
+A high-performance, multithreaded C++ application that aggregates real-time market data (Best Bid/Offer) from multiple exchanges (Binance, Coinbase) and identifies arbitrage opportunities.
 
+## Dependencies
+
+This project requires the following libraries:
+
+*   **OpenSSL**: For secure WebSocket (WSS) connections.
+*   **Boost**: Required by WebSocket++ for asynchronous I/O (Asio).
+*   **nlohmann-json**: For parsing exchange JSON responses.
+*   **WebSocket++ (websocketpp)**: Header-only library for C++ WebSocket client functionality.
+
+### Installation (Arch Linux)
+```bash
+sudo pacman -S openssl boost nlohmann-json websocketpp
+```
+
+### Installation (Ubuntu/Debian)
+```bash
+sudo apt-get install libssl-dev libboost-all-dev nlohmann-json3-dev libwebsocketpp-dev
+```
+
+## Building
+
+```bash
+mkdir build && cd build
+cmake ..
+make
+```

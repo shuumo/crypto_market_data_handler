@@ -1,48 +1,48 @@
 #include "ReaderManager.hpp"
-#include "CliFront.cpp"
+#include "IFront.hpp"
 #include "../DataStore/NoAtomicDataPair.hpp"
 #include <memory>
+#include <thread>
+#include <mutex>
+#include <shared_mutex>
+#include <iostream>
 
-void ReaderManager::reader_main(DataStore &map, const std::vector<std::string> &symbols) {
-    //create output pointers
-    std::shared_ptr<IFront> cli_output(std::make_shared<CliFront>());
- 
-    // main reader loop
-    int i{};
-    while(true) {
-        auto best_bid_asks = best_bid_ask_algorithm(map);
-        output_best(best_bid_asks, cli_output);
-        //if(++i == 10000) exit(1);
+auto ReaderManager::reader_main(DataStore &map,
+                                const std::vector<std::string> &symbols) -> void { }
+
+auto ReaderManager::output_best(std::unordered_map<std::string, NoAtomicDataPair> best_bid_asks,
+                                std::shared_ptr<IFront> output) -> bool {
+    if(output) {
+        output->output_bid_ask(best_bid_asks);
+        return true;
     }
+    return false;
 }
 
-bool ReaderManager::output_best(std::unordered_map<std::string, NoAtomicDataPair> best_bid_asks, std::shared_ptr<IFront> output) {
-    output->output_bid_ask(best_bid_asks);
-    return {};
-}
+auto ReaderManager::best_bid_ask_algorithm(DataStore &map) -> std::unordered_map<std::string, NoAtomicDataPair> {
+    auto best_map = std::unordered_map<std::string, NoAtomicDataPair>{};
 
-std::unordered_map<std::string, NoAtomicDataPair> ReaderManager::best_bid_ask_algorithm(DataStore &map) {
-    std::unordered_map<std::string, NoAtomicDataPair> best_map;
-    for(auto& symbol: map) {
-        DataPoint best_ask;
+    auto lock = std::shared_lock{map.get_mutex()};
+
+    for(auto it = map.begin(); it != map.end(); ++it) {
+        auto best_ask = DataPoint{};
         best_ask.price = std::numeric_limits<double>::max();
-        DataPoint best_bid;
+        auto best_bid = DataPoint{};
         best_bid.price = std::numeric_limits<double>::min();
-        std::string this_symbol = symbol.first;
 
-        int id = 0;
-        for(auto& exchange: symbol.second) {
-            DataPoint ask = map.get_ask(id, this_symbol);
-            if(best_ask.price > ask.price) best_ask = ask;
-            DataPoint bid = map.get_bid(id, this_symbol);
-            if(best_bid.price < bid.price) best_bid = bid;
-            id++;
+        const auto& this_symbol = it->first;
+        const auto& exchange_vec = it->second;
+
+        for(auto id = size_t{0}; id < exchange_vec.size(); ++id) {
+            auto ask = map.get_ask(static_cast<int>(id), this_symbol);
+            if(ask.price > 0 && ask.price < best_ask.price) best_ask = ask;
+
+            auto bid = map.get_bid(static_cast<int>(id), this_symbol);
+            if(bid.price > 0 && bid.price > best_bid.price) best_bid = bid;
         }
 
-        best_map[this_symbol].ask = best_ask;
-        best_map[this_symbol].bid = best_bid;
+        if(best_ask.price != std::numeric_limits<double>::max()) best_map[this_symbol].ask = best_ask;
+        if(best_bid.price != std::numeric_limits<double>::min()) best_map[this_symbol].bid = best_bid;
     }
     return best_map;
 }
-
-

@@ -1,19 +1,30 @@
 #include <iostream>
-
+#include <iomanip>
 #include "IFront.hpp"
 
 class CliFront : public IFront {
-    void output_bid_ask(std::unordered_map<std::string, NoAtomicDataPair> &best_bid_asks) override {
-        for(const auto& pair: best_bid_asks) {
-            double spread = pair.second.ask.price - pair.second.bid.price;
-            if(pair.second.bid.price == 0 || pair.second.ask.price == 0) return;
-            if(spread < 0) {
-                std::cout << "Arbitrage Opportunity Found!" << '\n';
-                std::cout << "Symbol " << pair.first << " had best ask of " << pair.second.ask.price
-                    << " and a best bid of " << pair.second.bid.price << '\n';
-                std::cout << "The spread is " << spread << '\n';
-                std::cout << '\n';
-            }
+public:
+    auto output_bid_ask(std::unordered_map<std::string, NoAtomicDataPair> &best_bid_asks) -> void override {
+        auto found = bool{false};
+        for(const auto& pair : best_bid_asks) {
+            const auto& ask = pair.second.ask;
+            const auto& bid = pair.second.bid;
+
+            if(bid.price <= 0 || ask.price <= 0) continue;
+
+            found = true;
+            auto spread = double{ask.price - bid.price};
+
+            std::cout << "[SYMBOL: " << std::setw(8) << pair.first << "] "
+                      << "Bid: " << std::fixed << std::setprecision(2) << std::setw(10) << bid.price 
+                      << " (" << bid.exchange_name << ") | "
+                      << "Ask: " << std::fixed << std::setprecision(2) << std::setw(10) << ask.price 
+                      << " (" << ask.exchange_name << ") | "
+                      << "Spread: " << std::setw(8) << spread;
+
+            if(spread < 0) std::cout << "  *** ARBITRAGE! ***";
+            std::cout << std::endl;
         }
+        if(found) std::cout << "--------------------------------------------------------------------------------" << std::endl;
     };
 };

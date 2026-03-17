@@ -9,16 +9,16 @@
 #include "ExchangeSocket/IExchangeSocket.hpp"
 
 
-void err(std::string description) {
+auto err(std::string description) -> void {
     std::cout << "err in: " << description << '\n';
     exit(0);
 }
 
-int main() {
+auto main() -> int {
     // data structures 
-    DataStore map;
-    std::vector<std::string> symbols;
-    std::vector<std::unique_ptr<IExchangeSocket>> exchanges;
+    auto map = DataStore{};
+    auto symbols = std::vector<std::string>{};
+    auto exchanges = std::vector<std::unique_ptr<IExchangeSocket>>{};
 
     // load data for task runner 
     if(!Loader::get_symbols(symbols)) err("symbols");

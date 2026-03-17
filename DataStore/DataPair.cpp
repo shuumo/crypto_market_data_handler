@@ -1,42 +1,43 @@
 #include "DataPair.hpp" 
 
-//std::mutex& DataPair::getMutex() {
-//    return data_mutex;
-//}
-
-void DataPair::lock_atomic_flag() noexcept {
+auto DataPair::lock_atomic_flag() noexcept -> void {
     while(true) {
-        if (!lock.exchange(true, std::memory_order_acquire)) return;
-        while(lock.load(std::memory_order_relaxed)) {
-            __builtin_ia32_pause();
-        }
+        if(!lock.exchange(true, std::memory_order_acquire)) return;
+        while(lock.load(std::memory_order_relaxed)) CPU_PAUSE();
     }
 }
 
-bool DataPair::try_atomic_flag() noexcept {
+auto DataPair::try_atomic_flag() noexcept -> bool {
     return !lock.load(std::memory_order_relaxed) &&
            !lock.exchange(true, std::memory_order_acquire);
 }
 
-void DataPair::unlock_atomic_flag() noexcept {
+auto DataPair::unlock_atomic_flag() noexcept -> void {
     lock.store(false, std::memory_order_release);
 }
 
-DataPoint DataPair::getAsk() const {
+auto DataPair::getAsk() const -> DataPoint {
     return ask;
 }
 
-DataPoint DataPair::getBid() const {
+auto DataPair::getBid() const -> DataPoint {
     return bid;
 }
 
-bool DataPair::setAsk(DataPoint ask) {
+auto DataPair::setAsk(const DataPoint& ask) -> bool {
     this->ask = ask;
     return true;
 }
 
-bool DataPair::setBid(DataPoint bid) {
+auto DataPair::setBid(const DataPoint& bid) -> bool {
     this->bid = bid;
     return true;
 }
 
+auto DataPair::valid_ask() const -> bool {
+    return ask.price > 0;
+}
+
+auto DataPair::valid_bid() const -> bool {
+    return bid.price > 0;
+}

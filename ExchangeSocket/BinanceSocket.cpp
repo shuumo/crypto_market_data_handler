@@ -2,68 +2,79 @@
 #include <websocketpp/client.hpp>
 #include <nlohmann/json.hpp>
 #include "IExchangeSocket.hpp"
+#include <chrono>
+#include <algorithm>
+#include <iostream>
 
 typedef websocketpp::client<websocketpp::config::asio_tls_client> client;
 
 class BinanceSocket : public IExchangeSocket {
 public:
-    void run_socket(DataStore &map, const std::vector<std::string> &symbols,
-                    std::vector<std::unique_ptr<IExchangeSocket>> &exchanges, const int id) override {
+    auto run_socket(DataStore &map,
+                    const std::vector<std::string> &symbols,
+                    std::vector<std::unique_ptr<IExchangeSocket>> &exchanges,
+                    const int id) -> void override {
 
         if(symbols.empty()) return;
 
-        std::string uri = "wss://stream.binance.com:9443/stream?streams=";
-        for(size_t i = 0; i < symbols.size(); ++i) {
+        auto uri = std::string{"wss://stream.binance.com:9443/stream?streams="};
+        for(auto i = size_t{0}; i < symbols.size(); ++i) {
             uri += symbols[i] + "@bookTicker";
             if(i < symbols.size() - 1) uri += "/";
         }
 
-        client c;
-        c.clear_access_channels(websocketpp::log::alevel::all);
-        c.set_access_channels(websocketpp::log::alevel::connect);
-        c.init_asio();
+        try {
+            auto c = client{};
+            c.clear_access_channels(websocketpp::log::alevel::all);
+            c.init_asio();
 
-        c.set_tls_init_handler([](websocketpp::connection_hdl) {
-            return websocketpp::lib::make_shared<boost::asio::ssl::context>(
-                boost::asio::ssl::context::tlsv12_client
-            );
-        });
+            c.set_tls_init_handler([](websocketpp::connection_hdl) {
+                auto ctx = websocketpp::lib::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::tlsv12_client);
+                ctx->set_options(boost::asio::ssl::context::default_workarounds |
+                                 boost::asio::ssl::context::no_sslv2 |
+                                 boost::asio::ssl::context::no_sslv3 |
+                                 boost::asio::ssl::context::single_dh_use);
+                return ctx;
+            });
 
-        c.set_message_handler([&map, id](websocketpp::connection_hdl, client::message_ptr msg) {
-            try {
-                auto j = nlohmann::json::parse(msg->get_payload());
-                //std::cout << msg->get_payload() << std::endl;
-                const auto& data = j["data"];
-                std::string symbol = data["s"];
-                std::transform(symbol.begin(), symbol.end(), symbol.begin(), ::tolower);
-                double bid = std::stod(data["b"].get<std::string>());
-                double ask = std::stod(data["a"].get<std::string>());
+            c.set_message_handler([&map, id](websocketpp::connection_hdl, client::message_ptr msg) {
+                try {
+                    auto j = nlohmann::json::parse(msg->get_payload());
+                    if(!j.contains("data")) return;
 
-                DataPoint bid_point;
-                DataPoint ask_point;
+                    const auto& data = j["data"];
+                    auto symbol = data["s"].get<std::string>();
+                    std::transform(symbol.begin(), symbol.end(), symbol.begin(), ::tolower);
 
-                bid_point.price = bid;
-                ask_point.price = ask;
-                bid_point.exchange_name = "Binance";
-                ask_point.exchange_name = "Binance";
+                    auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock::now().time_since_epoch()).count();
 
-                //std::cout << "This threads id is: " << id << '\n';
-                map.write_bid(id, symbol, bid_point);
-                map.write_ask(id, symbol, ask_point);
-            } catch (...) {
-                std::cerr << "Failed to parse or update data.\n";
+                    auto bid_p = DataPoint{};
+                    bid_p.price = std::stod(data["b"].get<std::string>());
+                    bid_p.exchange_name = "Binance";
+                    bid_p.timestamp = now;
+
+                    auto ask_p = DataPoint{};
+                    ask_p.price = std::stod(data["a"].get<std::string>());
+                    ask_p.exchange_name = "Binance";
+                    ask_p.timestamp = now;
+
+                    map.write_bid(id, symbol, bid_p);
+                    map.write_ask(id, symbol, ask_p);
+                } catch(...) { }
+            });
+
+            auto ec = websocketpp::lib::error_code{};
+            auto con = c.get_connection(uri, ec);
+            if(ec) {
+                std::cerr << "Binance connect error: " << ec.message() << std::endl;
+                return;
             }
-        });
 
-        websocketpp::lib::error_code ec;
-        client::connection_ptr con = c.get_connection(uri, ec);
-        if (ec) {
-            std::cerr << "Connection failed: " << ec.message() << std::endl;
-            return;
+            c.connect(con);
+            c.run();
+        } catch(const std::exception& e) {
+            std::cerr << "Binance runtime error: " << e.what() << std::endl;
         }
-
-        c.connect(con);
-        c.run();
     }
 };
-

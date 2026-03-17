@@ -10,28 +10,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(OpenSSL REQUIRED)
 find_package(Boost REQUIRED)
 find_package(nlohmann_json REQUIRED)
+find_package(websocketpp REQUIRED)
 
 # Target files
+# We exclude .cpp files that are included elsewhere to avoid multiple definition errors
 add_executable(${TARGET_NAME}
     Main.cpp
-    Core/TaskRunner.hpp
     Core/TaskRunner.cpp
-    Core/AtomicGuard.hpp
-    Loader/Loader.hpp
     Loader/Loader.cpp
-    DataStore/DataPair.hpp
     DataStore/DataPair.cpp
-    DataStore/DataPoint.hpp
-    DataStore/NoAtomicDataPair.hpp
-    DataStore/DataStore.hpp
     DataStore/DataStore.cpp
-    ExchangeSocket/IExchangeSocket.hpp
-    ExchangeSocket/BinanceSocket.cpp
-    ExchangeSocket/CoinbaseSocket.cpp
-    ExchangeSocket/TestSocket.cpp
-    Front/IFront.hpp
-    Front/CliFront.cpp
-    Front/ReaderManager.hpp
     Front/ReaderManager.cpp
 )
 
@@ -42,8 +30,8 @@ target_link_libraries(${TARGET_NAME}
     OpenSSL::Crypto
     Boost::boost
     nlohmann_json::nlohmann_json
+    websocketpp::websocketpp
     pthread
 )
 
 message(STATUS "Welcome to Arnavs project: " ${TARGET_NAME})
-

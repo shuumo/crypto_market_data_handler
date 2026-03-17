@@ -1,24 +1,19 @@
 #include "Loader.hpp"
-
-// IExchangeScokets
-#include "../ExchangeSocket/TestSocket.cpp"
 #include "../ExchangeSocket/BinanceSocket.cpp"
 #include "../ExchangeSocket/CoinbaseSocket.cpp"
+#include "../ExchangeSocket/TestSocket.cpp"
 
-
-bool Loader::get_symbols(std::vector<std::string> &symbols) {
+auto Loader::get_symbols(std::vector<std::string> &symbols) -> bool {
+    symbols.clear();
     symbols.push_back("btcusdt");
-    symbols.push_back("ltcusdt");
     symbols.push_back("ethusdt");
+    symbols.push_back("solusdt");
     return true;
 }
 
-bool Loader::get_exchanges(std::vector<std::unique_ptr<IExchangeSocket>> &exchanges) {
-    //exchanges.push_back(std::make_unique<TestSocket>());
+auto Loader::get_exchanges(std::vector<std::unique_ptr<IExchangeSocket>> &exchanges) -> bool {
+    exchanges.clear();
     exchanges.push_back(std::make_unique<BinanceSocket>());
     exchanges.push_back(std::make_unique<CoinbaseSocket>());
     return true;
 }
-
-
-
