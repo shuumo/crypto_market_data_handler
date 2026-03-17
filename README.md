@@ -1,6 +1,6 @@
 # Crypto Market Data Aggregator
 
-A high-performance, multithreaded C++ application that aggregates real-time market data (Best Bid/Offer) from multiple exchanges (Binance, Coinbase) and identifies arbitrage opportunities.
+A high-performance, modular C++ application designed for real-time market data ingestion and arbitrage detection. Its architecture is decoupled into specialized components: Exchange Sockets, Thread Safe DataStore and Reader Management, which together enable seamless integration of new exchanges and front end outputs while maintaining low latency.
 
 ## Dependencies
 
@@ -14,11 +14,6 @@ This project requires the following libraries:
 ### Installation (Arch Linux)
 ```bash
 sudo pacman -S openssl boost nlohmann-json websocketpp
-```
-
-### Installation (Ubuntu/Debian)
-```bash
-sudo apt-get install libssl-dev libboost-all-dev nlohmann-json3-dev libwebsocketpp-dev
 ```
 
 ## Building
