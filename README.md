@@ -20,12 +20,12 @@ This project requires the following libraries:
 *   **Boost**: Required by WebSocket++ for asynchronous I/O (Asio).
 
 
-### Installation (Arch Linux)
+### Installation of Dependencies (Arch Linux)
 ```bash
 sudo pacman -S openssl boost nlohmann-json websocketpp
 ```
 
-## Building
+## Building the Repo 
 
 ```bash
 mkdir build && cd build
