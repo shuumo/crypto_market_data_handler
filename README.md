@@ -4,7 +4,7 @@ A high-performance, modular C++ application designed for real-time market data i
 
 ## System Requirements
 
-This project utilizes modern C++17 features and requires a compatible toolchain:
+This project uses C++17 features and requires a compatible toolchain:
 
 *   **C++ Compiler**: GCC 7+ or Clang 5+ (supporting C++17).
 *   **CMake**: Version 3.10 or higher.
@@ -15,9 +15,10 @@ This project utilizes modern C++17 features and requires a compatible toolchain:
 This project requires the following libraries:
 
 *   **OpenSSL**: For secure WebSocket (WSS) connections.
-*   **Boost**: Required by WebSocket++ for asynchronous I/O (Asio).
 *   **nlohmann-json**: For parsing exchange JSON responses.
 *   **WebSocket++ (websocketpp)**: Header-only library for C++ WebSocket client functionality.
+*   **Boost**: Required by WebSocket++ for asynchronous I/O (Asio).
+
 
 ### Installation (Arch Linux)
 ```bash
